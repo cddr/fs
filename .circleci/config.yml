@@ -99,8 +99,7 @@ jobs:
             mkdir -p "$GNUPGHOME"
             chmod 0700 "$GNUPGHOME"
 
-              echo "$GPG_KEY" \
-               | base64 --decode --ignore-garbage \
+              echo -e "$GPG_KEY" \
                | gpg --batch --allow-secret-key-import --import
 
                gpg --keyid-format LONG --list-secret-keys
