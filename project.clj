@@ -1,4 +1,4 @@
-(defproject clj-commons/fs (or (System/getenv "PROJECT_VERSION") "0.1.0-SNAPSHOT")
+(defproject cddr/fs :project/git-ref-short
   :description "File system utilities for clojure"
   :license {:name "Eclipse Public License - v 1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -16,8 +16,19 @@
                  [org.tukaani/xz "1.8"]]
   :plugins [[lein-midje "3.1.3"]
             [codox "0.8.10"]
-            [lein-ancient "0.6.15"]]
+            [lein-ancient "0.6.15"]
+            [me.arrdem/lein-git-version "2.0.8"]]
   :codox {:src-dir-uri "https://github.com/clj-commons/fs/blob/master/"
           :src-linenum-anchor-prefix "L"
           :defaults {:doc/format :markdown}}
-  :profiles {:dev {:dependencies [[midje "1.9.4"]]}})
+  :profiles {:dev {:dependencies [[midje "1.9.4"]]}}
+  :git-version {:status-to-version
+                (fn [{:keys [tag version branch ahead ahead? dirty?] :as git}]
+                  (assert (re-find #"\d+\.\d+\.\d+" tag)
+                          "Tag is assumed to be a raw SemVer version")
+                  (if (and tag (not ahead?) (not dirty?))
+                    tag
+                    (let [[_ prefix patch] (re-find #"(\d+\.\d+)\.(\d+)" tag)
+                          patch            (Long/parseLong patch)
+                          patch+           (inc patch)]
+                      (format "%s.%d-%s-SNAPSHOT" prefix patch+ branch))))})
